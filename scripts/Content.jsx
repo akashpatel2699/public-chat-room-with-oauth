@@ -18,7 +18,7 @@ export function Content() {
                 setMessages(data['messages']);
                 setUsersConnected(data['usersConnected'])
             })
-            Socket.on('new messages', data => {
+            Socket.on('new message', data => {
                 setMessages([...messages,data['chat']])
             })
             Socket.on('addNewUser', data => {
