@@ -5,6 +5,7 @@ from datetime import datetime
 
 class Messages(db.Model):
     __tablename__ = 'messages'
+    
     username = db.Column(db.String(100),primary_key=True, nullable=False)
     message  = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime,primary_key=True, nullable=False, default=datetime.utcnow)
@@ -17,9 +18,12 @@ class Messages(db.Model):
     
 class Connected_users(db.Model):
     __tablename__ = 'connected_users'
-    socket_id = db.Column(db.String(100),primary_key=True, nullable=False)
     
-    def __init__(self, socket_id):
+    socket_id = db.Column(db.String(100),primary_key=True, nullable=False)
+    username = db.Column(db.String(50), nullable=False)
+    
+    def __init__(self, socket_id, username):
         self.socket_id = socket_id
+        self.username = username
     def __repr__(self):
-        return '<Connected_users: %s>' % self.socket_id
+        return '<Connected_users: %s has %s>' % self.socket_id,self.username

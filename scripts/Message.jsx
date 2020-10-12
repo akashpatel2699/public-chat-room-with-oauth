@@ -7,7 +7,7 @@ const Message = ({ message }) => {
     
     return (
         <Fragment>
-            <p>{message['username']}=>{created_at.getHours()}:{created_at.getMinutes()}</p>
+            <p>{message['username']}=>{created_at.getHours() === 12? created_at.getHours(): created_at.getHours() % 12}:{created_at.getMinutes()}</p>
             <p>{message['message']}</p> 
         </Fragment>
     );

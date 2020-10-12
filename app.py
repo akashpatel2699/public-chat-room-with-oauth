@@ -8,6 +8,7 @@ import flask_socketio
 import random
 from datetime import datetime
 import pytz
+from random_username.generate import generate_username
 
 SEND_ALL_MESSAGES_NEW_USER_CHANNEL = 'joinuser'
 ADD_NEW_USER_CHANNEL = 'addNewUser'
@@ -41,24 +42,28 @@ db.session.commit()
 
 
 #Add newly connected user to currently connected users in postgres
-def add_new_connected_user(channel, socket_sid):
-    new_user  = models.Connected_users(socket_id=socket_sid)
+def add_new_connected_user(channel, socket_sid,username):
+    print(username + "==========================")
+    new_user  = models.Connected_users(socket_id=socket_sid,username=username)
     db.session.add(new_user)
     db.session.commit()
 
-    socketio.emit(channel, {'addNewUser': socket_sid},skip_sid=socket_sid)
+    socketio.emit(channel, {'addNewUser': username},skip_sid=socket_sid)
     
 # Remove disconnected user from connected users list in postgres 
 def remove_disconnected_user(channel,socket_sid):
-    db.session.query(models.Connected_users).filter_by(socket_id=socket_sid).delete()
+    user_to_remove = db.session.query(models.Connected_users).get(socket_sid)
+    # user_to_remove = db.session.query(models.Connected_users).filter_by(socket_id=socket_sid).first()
+    username = user_to_remove.username
+    db.session.delete(user_to_remove)
     db.session.commit()
     
-    socketio.emit(channel, {'removeUser': socket_sid},include_self=False)
+    socketio.emit(channel, {'removeUser': username},include_self=False)
 
-def emit_all_messages(channel,socket_sid):
-    # TODO - content.jsx looking for all addresses, we want to emit to all address
+def emit_all_messages(channel,socket_sid,username):
+
     all_connected_users = [ \
-        db_users.socket_id for db_users in \
+        db_users.username for db_users in \
         db.session.query(models.Connected_users).all()
     ]
     all_message_objects = [ \
@@ -70,26 +75,27 @@ def emit_all_messages(channel,socket_sid):
     
     socketio.emit(channel, {
         'message_objects':all_message_objects,
-        'username': socket_sid,
+        'username': username,
         'usersConnected':all_connected_users
     },room=socket_sid)   
 
 def add_new_message(channel,socket_sid,message):
     created_at = pytz.utc.localize(datetime.now(),is_dst=None).astimezone(tz_NY)
-    new_message = models.Messages(username=socket_sid,message=message,created_at=created_at)
+    username = db.session.query(models.Connected_users).get(socket_sid).username
+    new_message = models.Messages(username=username,message=message,created_at=created_at)
     db.session.add(new_message)
     db.session.commit()
 
     socketio.emit(channel,{
-        'newMessage': {'username':socket_sid,'message':message,'created_at': str(created_at)}
+        'newMessage': {'username':username,'message':message,'created_at': str(created_at)}
     })
 
 @socketio.on('connect')
 def on_connect():
     socket_sid = flask.request.sid
-    username = socket_sid
-    emit_all_messages(SEND_ALL_MESSAGES_NEW_USER_CHANNEL,username)
-    add_new_connected_user(ADD_NEW_USER_CHANNEL, socket_sid)
+    username = generate_username()[0]
+    emit_all_messages(SEND_ALL_MESSAGES_NEW_USER_CHANNEL, socket_sid,username)
+    add_new_connected_user(ADD_NEW_USER_CHANNEL,socket_sid,username)
     
 
 @socketio.on('disconnect')
