@@ -15,11 +15,11 @@ export function Content() {
         React.useEffect(() => {
             Socket.on('joinuser', data => {
                 setUsername(data['username']);
-                setMessages(data['messages']);
+                setMessages(data['message_objects']);
                 setUsersConnected(data['usersConnected'])
             })
             Socket.on('new message', data => {
-                setMessages([...messages,data['chat']])
+                setMessages([...messages,data['newMessage']])
             })
             Socket.on('addNewUser', data => {
                 setUsersConnected([...usersConnected,data['addNewUser']])

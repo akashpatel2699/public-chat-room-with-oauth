@@ -8,11 +8,15 @@ import flask_socketio
 # import models
 import random
 from datetime import datetime
+import pytz
 
 SEND_ALL_MESSAGES_NEW_USER_CHANNEL = 'joinuser'
 ADD_NEW_USER_CHANNEL = 'addNewUser'
 REMOVE_DISCONNECTED_USER_CHANNEL = 'removeUser'
 RECIEVE_NEW_MESSAGE = 'new message'
+
+# Convert datetime to local time zone
+tz_NY = pytz.timezone('America/New_York') 
 
 app = flask.Flask(__name__)
 
@@ -62,24 +66,25 @@ def emit_all_messages(channel,socket_sid):
         db_users.socket_id for db_users in \
         db.session.query(models.Connected_users).all()
     ]
-    all_messages = [ \
-        db_message.message for db_message in \
+    all_message_objects = [ \
+        {'username':db_message.username,'message':db_message.message,'created_at':db_message.created_at.isoformat()} for db_message in \
         db.session.query(models.Messages).order_by(models.Messages.created_at).all()
     ]
     
     socketio.emit(channel, {
-        'username': socket_sid, 
-        'messages': all_messages,
+        'message_objects':all_message_objects,
+        'username': socket_sid,
         'usersConnected':all_connected_users
     },room=socket_sid)   
 
 def add_new_message(channel,socket_sid,message):
-    new_message = models.Messages(username=socket_sid,message=message)
+    created_at = datetime.now(tz_NY)
+    new_message = models.Messages(username=socket_sid,message=message,created_at=created_at)
     db.session.add(new_message)
     db.session.commit()
 
     socketio.emit(channel,{
-        'chat': message
+        'newMessage': {'username':socket_sid,'message':message,'created_at': created_at.isoformat()}
     })
 
 @socketio.on('connect')

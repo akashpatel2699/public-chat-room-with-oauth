@@ -9,9 +9,10 @@ class Messages(db.Model):
     message  = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime,primary_key=True, nullable=False,
         default=datetime.now)
-    def __init__(self, username,message):
+    def __init__(self, username,message,created_at):
         self.username = username
         self.message = message
+        self.created_at = created_at
     def __repr__(self):
         return '<message: %s by %s>' % self.message,self.username
     

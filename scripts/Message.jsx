@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 
-const Message = ({ message }) => {
+const Message = ({ message}) => {
     return (
-        <p>{message}</p>    
+        <Fragment>
+            <p>{message['username']}  {message['created_at']}</p>
+            <p>{message['message']}</p> 
+        </Fragment>
     );
 }
 
