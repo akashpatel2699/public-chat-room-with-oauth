@@ -1,9 +1,13 @@
-import React, { Fragment } from 'react';
+import React, {Fragment } from 'react';
 
-const Message = ({ message}) => {
+const string_datetime_object = string => new Date(Date.parse(string));
+
+const Message = ({ message }) => {
+    let created_at = string_datetime_object(message['created_at'])
+    
     return (
         <Fragment>
-            <p>{message['username']}  {message['created_at']}</p>
+            <p>{message['username']}=>{created_at.getHours()}:{created_at.getMinutes()}</p>
             <p>{message['message']}</p> 
         </Fragment>
     );

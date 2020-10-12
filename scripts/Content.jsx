@@ -17,17 +17,26 @@ export function Content() {
                 setUsername(data['username']);
                 setMessages(data['message_objects']);
                 setUsersConnected(data['usersConnected'])
+                console.log("joinuser")
             })
             Socket.on('new message', data => {
                 setMessages([...messages,data['newMessage']])
+                console.log(data['newMessage']['created_at'])
             })
             Socket.on('addNewUser', data => {
                 setUsersConnected([...usersConnected,data['addNewUser']])
+                console.log("addNewUser")
             })
             Socket.on('removeUser', data => {
-                 let removeUser = data['removeUser']
+                let removeUser = data['removeUser']
                 setUsersConnected(usersConnected.filter( user => user !== removeUser))
+                console.log("removeUser")
             })
+            return () => {
+                Socket.off('new message');
+                Socket.off('addNewUser');
+                Socket.off('removeUser');
+            }
         });
     }
     
