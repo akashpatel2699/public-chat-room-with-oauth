@@ -92,21 +92,24 @@ def add_new_message(channel,socket_sid,message):
     
     # bot define here
     if message.startswith('!! ', 0 , 3):
+        bot_reply= ''
         if 'about' in message:
-            socketio.emit(channel,{
-            'newMessage': {'username':bot.NAME,'message':bot.about(),'created_at': str(created_at)}
-            })
+            bot_reply = bot.about()
         elif 'help' in message:
-            socketio.emit(channel,{
-            'newMessage': {'username':bot.NAME,'message':bot.help(),'created_at': str(created_at)}
-            })
+            bot_reply = bot.help()
         elif 'funtranslate' in message:
             tmp = message.find('funtranslate')
-            message_to_translate = message[tmp + message[tmp:].index(' ')+1:]
+            try:
+                message_to_translate = message[tmp + message[tmp:].index(' ')+1:]
+                bot_reply = bot.funtranslate(message_to_translate)
+            except ValueError:
+                bot_reply = "Incorrect format. Try !! help to see the correct format"
             # print(bot.funtranslate(message_to_translate))
-            socketio.emit(channel,{
-            'newMessage': {'username':bot.NAME,'message':bot.funtranslate(message_to_translate),'created_at': str(created_at)}
-            })
+        else:
+            bot_reply= "Unrecognized command. Please use !! help to see available commands."
+        socketio.emit(channel,{
+        'newMessage': {'username':bot.NAME,'message':bot_reply,'created_at': str(created_at)}
+        })
         
 @socketio.on('connect')
 def on_connect():

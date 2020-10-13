@@ -21,7 +21,6 @@ export function Content() {
             })
             Socket.on('new message', data => {
                 setMessages([...messages,data['newMessage']])
-                console.log(data['newMessage']['created_at'])
             })
             Socket.on('addNewUser', data => {
                 setUsersConnected([...usersConnected,data['addNewUser']])
@@ -43,10 +42,10 @@ export function Content() {
     getNewAddresses();
 
     return (
-        <div>
+        <div className="container">
             <Header username={username}/>
             <ShowUsers usersConnected={usersConnected} />
-            <Messages messages={messages} />
+            <Messages messages={messages} username={username}/>
             <Form />
         </div>
     );
