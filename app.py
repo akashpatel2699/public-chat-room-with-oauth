@@ -79,10 +79,10 @@ def emit_all_messages(channel,socket_sid,username):
         'usersConnected':all_connected_users
     },room=socket_sid)   
 
-def add_new_message(channel,socket_sid,message):
+def add_new_message(channel,socket_sid,message,username):
     created_at = pytz.utc.localize(datetime.now(),is_dst=None).astimezone(tz_NY)
-    username = db.session.query(models.Connected_users).get(socket_sid).username
-    new_message = models.Messages(username=username,message=message,created_at=created_at)
+    username =  db.session.query(models.Connected_users).get(socket_sid).username if len(username) == 0  else username
+    new_message = models.Messages(username=username,message=message,created_at=created_at) 
     db.session.add(new_message)
     db.session.commit()
 
@@ -90,35 +90,36 @@ def add_new_message(channel,socket_sid,message):
         'newMessage': {'username':username,'message':message,'created_at': str(created_at)}
     })
     
-    # bot define here
-    if message.startswith('!! ', 0 , 3):
-        bot_reply= ''
-        if 'about' in message:
-            bot_reply = bot.about()
-        elif 'help' in message:
-            bot_reply = bot.help()
-        elif 'funtranslate' in message:
-            tmp = message.find('funtranslate')
-            try:
-                message_to_translate = message[tmp + message[tmp:].index(' ')+1:]
-                bot_reply = bot.funtranslate(message_to_translate)
-            except ValueError:
-                bot_reply = "Incorrect format. Try !! help to see the correct format"
-            # print(bot.funtranslate(message_to_translate))
-        elif 'weather' in message:
-            tmp = message.find('weather')
-            try:
-                weather_city = message[tmp + message[tmp:].index(' ')+1:]
-                bot_reply = bot.weather(weather_city)
-            except ValueError:
-                bot_reply = "Incorrect format. Try !! help to see the correct format"
-        elif 'how old are you' in message:
-            bot_reply = bot.how_old_are_you()
-        else:
-            bot_reply= "Unrecognized command. Please use !! help to see available commands."
-        socketio.emit(channel,{
-        'newMessage': {'username':bot.NAME,'message':bot_reply,'created_at': str(created_at)}
-        })
+def check_for_bot_command(message):
+    # check for valid bot command and act accordingly
+    bot_reply= ''
+    if 'about' in message:
+        bot_reply = bot.about()
+    elif 'help' in message:
+        bot_reply = bot.help()
+    elif 'funtranslate' in message:
+        tmp = message.find('funtranslate')
+        try:
+            message_to_translate = message[tmp + message[tmp:].index(' ')+1:]
+            bot_reply = bot.funtranslate(message_to_translate)
+        except ValueError:
+            bot_reply = "Incorrect format. Try !! help to see the correct format"
+    elif 'weather' in message:
+        tmp = message.find('weather')
+        try:
+            weather_city = message[tmp + message[tmp:].index(' ')+1:]
+            bot_reply = bot.weather(weather_city)
+        except ValueError:
+            bot_reply = "Incorrect format. Try !! help to see the correct format"
+    elif 'how old are you' in message:
+        bot_reply = bot.how_old_are_you()
+    else:
+        bot_reply= "Unrecognized command. Please use !! help to see available commands."
+    # socketio.emit(channel,{
+    # 'newMessage': {'username':bot.NAME,'message':bot_reply,'created_at': str(created_at)}
+    # })
+    return bot_reply
+
         
 @socketio.on('connect')
 def on_connect():
@@ -140,7 +141,10 @@ def on_disconnect():
 def on_new_address(data):
     socket_sid = flask.request.sid 
     message = data['chat']
-    add_new_message(RECIEVE_NEW_MESSAGE,socket_sid,message)
+    add_new_message(RECIEVE_NEW_MESSAGE,socket_sid,message, "")
+    if message.startswith('!! ', 0 , 3):
+        message =  check_for_bot_command(message)
+        add_new_message(RECIEVE_NEW_MESSAGE,"",message, bot.NAME)
 
 @app.route('/')
 def index():

@@ -88,8 +88,13 @@ body {
     display: flex;
     flex-direction: column;
 }
-.message p {
-    margin: 0.6rem 0;
+.message .username {
+    margin: 0px;
+    margin-top: 1rem;
+}
+.main-message {
+    margin: 0px;
+    margin-bottom: 0.5rem;
 }
 .message .username span {
     font-size: 0.8rem;
@@ -150,7 +155,7 @@ body {
     width: 10px;
     background: transparent;  ;
 }
-/* Optional: show position indicator in red */
+
 ::-webkit-scrollbar-thumb {
     border-radius: 10px;
     height: auto ;
