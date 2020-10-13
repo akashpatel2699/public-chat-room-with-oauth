@@ -105,6 +105,15 @@ def add_new_message(channel,socket_sid,message):
             except ValueError:
                 bot_reply = "Incorrect format. Try !! help to see the correct format"
             # print(bot.funtranslate(message_to_translate))
+        elif 'weather' in message:
+            tmp = message.find('weather')
+            try:
+                weather_city = message[tmp + message[tmp:].index(' ')+1:]
+                bot_reply = bot.weather(weather_city)
+            except ValueError:
+                bot_reply = "Incorrect format. Try !! help to see the correct format"
+        elif 'how old are you' in message:
+            bot_reply = bot.how_old_are_you()
         else:
             bot_reply= "Unrecognized command. Please use !! help to see available commands."
         socketio.emit(channel,{
