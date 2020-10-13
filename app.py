@@ -9,6 +9,7 @@ import random
 from datetime import datetime
 import pytz
 from random_username.generate import generate_username
+import bot
 
 SEND_ALL_MESSAGES_NEW_USER_CHANNEL = 'joinuser'
 ADD_NEW_USER_CHANNEL = 'addNewUser'
@@ -43,7 +44,6 @@ db.session.commit()
 
 #Add newly connected user to currently connected users in postgres
 def add_new_connected_user(channel, socket_sid,username):
-    print(username + "==========================")
     new_user  = models.Connected_users(socket_id=socket_sid,username=username)
     db.session.add(new_user)
     db.session.commit()
@@ -89,9 +89,28 @@ def add_new_message(channel,socket_sid,message):
     socketio.emit(channel,{
         'newMessage': {'username':username,'message':message,'created_at': str(created_at)}
     })
-
+    
+    # bot define here
+    if message.startswith('!! ', 0 , 3):
+        if 'about' in message:
+            socketio.emit(channel,{
+            'newMessage': {'username':bot.NAME,'message':bot.about(),'created_at': str(created_at)}
+            })
+        elif 'help' in message:
+            socketio.emit(channel,{
+            'newMessage': {'username':bot.NAME,'message':bot.help(),'created_at': str(created_at)}
+            })
+        elif 'funtranslate' in message:
+            tmp = message.find('funtranslate')
+            message_to_translate = message[tmp + message[tmp:].index(' ')+1:]
+            # print(bot.funtranslate(message_to_translate))
+            socketio.emit(channel,{
+            'newMessage': {'username':bot.NAME,'message':bot.funtranslate(message_to_translate),'created_at': str(created_at)}
+            })
+        
 @socketio.on('connect')
 def on_connect():
+    print("hello")
     socket_sid = flask.request.sid
     username = generate_username()[0]
     emit_all_messages(SEND_ALL_MESSAGES_NEW_USER_CHANNEL, socket_sid,username)
@@ -108,7 +127,8 @@ def on_disconnect():
 @socketio.on('new message')
 def on_new_address(data):
     socket_sid = flask.request.sid 
-    add_new_message(RECIEVE_NEW_MESSAGE,socket_sid,data['chat'])
+    message = data['chat']
+    add_new_message(RECIEVE_NEW_MESSAGE,socket_sid,message)
 
 @app.route('/')
 def index():
