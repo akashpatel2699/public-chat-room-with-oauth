@@ -111,13 +111,15 @@ def check_for_bot_command(message):
             bot_reply = bot.weather(weather_city)
         except ValueError:
             bot_reply = "Incorrect format. Try !! help to see the correct format"
-    elif 'how old are you' in message:
-        bot_reply = bot.how_old_are_you()
+    elif 'predict_age' in message:
+        tmp = message.find('predict_age')
+        try:
+            name = message[tmp + message[tmp:].index(' ')+1:]
+            bot_reply = bot.predict_age(name)
+        except ValueError:
+            bot_reply = "Incorrect format. Try !! help to see the correct format"
     else:
         bot_reply= "Unrecognized command. Please use !! help to see available commands."
-    # socketio.emit(channel,{
-    # 'newMessage': {'username':bot.NAME,'message':bot_reply,'created_at': str(created_at)}
-    # })
     return bot_reply
 
         

@@ -12,6 +12,7 @@ OPEN_WEATHER_API_KEY = os.environ['OPEN_WEATHER_API_KEY']
 NAME = "sugerBot"
 FUN_TRANSLATE_BASE_URL = "https://api.funtranslations.com/translate/chef.json?text="
 OPEN_WEATHER_API_BASE_URL = "https://api.openweathermap.org/data/2.5/weather?"
+PREDICT_AGE_BASED_ON_API = "https://api.agify.io?name={}&country_id=US"
 
 def about():
     return "I am %s, my job is to reply to message that have !! follow by available commands. To see the available \
@@ -20,7 +21,7 @@ def about():
 def help():
     return "I recognize following commands and should be type exact for better conversation: \
         !! about or !! help or !! funtranslate <message> or !! weather <city name> \
-        or !! how old are you"
+        or !! predict_age <name>"
 def funtranslate(message):
     URL = FUN_TRANSLATE_BASE_URL+ message
     reply = requests.get(URL)
@@ -39,5 +40,11 @@ def weather(city):
     except KeyError:
         return 'Maybe invalid city name. Try valid city name like jersey city or new york city'
 
-def how_old_are_you():
-    return "I am %s. I was never born in this world, but still going to live forever!" %NAME
+def predict_age(name):
+    URL = PREDICT_AGE_BASED_ON_API.format(name)
+    response = requests.get(URL)
+    response = response.json()
+    try:
+        return "%s your predicted age is %d" % (name,response['age'])
+    except KeyError: 
+        return "Try some other name than %s" %name
