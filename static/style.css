@@ -118,6 +118,7 @@ body {
     width: 100%;
     justify-self: center;
     align-self: center;
+    text-align: center;
 }
 .text-input input[type="text"]{
     min-width: 60%;

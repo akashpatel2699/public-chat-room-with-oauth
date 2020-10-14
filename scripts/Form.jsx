@@ -21,7 +21,7 @@ const Form = () => {
   };
 
   return (
-    <form className="text-input w3-center">
+    <form className="text-input">
       <input value={input} type="text" onChange={handleChange} className="user-input" required />
       <button id="button" onClick={handleClick} disabled={buttonState}>
         Submit
