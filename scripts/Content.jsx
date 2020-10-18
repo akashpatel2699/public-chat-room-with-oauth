@@ -1,0 +1,52 @@
+    
+import * as React from 'react';
+import  Form  from './Form';
+import { Socket } from './Socket';
+import Header from './Header';
+import Messages from './Messages';
+import ShowUsers from './ShowUsers';
+import Login from './Login';
+
+export function Content() {
+    const [messages, setMessages] = React.useState([]);
+    const [username, setUsername] = React.useState("");
+    const [usersConnected, setUsersConnected] = React.useState([]);
+    
+    function getNewAddresses() {
+        React.useEffect(() => {
+            Socket.on('joinuser', data => {
+                setUsername(data['username']);
+                setMessages(data['message_objects']);
+                setUsersConnected(data['usersConnected'])
+            })
+            Socket.on('new message', data => {
+                setMessages([...messages,data['newMessage']])
+            })
+            Socket.on('addNewUser', data => {
+                setUsersConnected([...usersConnected,data['addNewUser']])
+            })
+            Socket.on('removeUser', data => {
+                let removeUser = data['removeUser']
+                setUsersConnected(usersConnected.filter( user => user !== removeUser))
+            })
+            return () => {
+                Socket.off('new message');
+                Socket.off('addNewUser');
+                Socket.off('removeUser');
+            }
+        });
+    }
+    
+    getNewAddresses();
+    
+    return (
+            usersConnected.includes(username)?
+                <div className="container">
+                    <Header username={username}/>
+                    <ShowUsers usersConnected={usersConnected} />
+                    <Messages messages={messages} username={username}/>
+                    <Form />
+                </div>: 
+                <Login /> 
+    );
+}
