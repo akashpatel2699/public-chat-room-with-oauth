@@ -7,7 +7,7 @@ const Form = () => {
 
   const handleChange = (event) => {
     const data = event.target.value;
-    if (data.trim().length > 0) setButtonState(false);
+    if (data.trim().length > 0 ) setButtonState(false);
     else setButtonState(true);
     setInput(data);
   };

@@ -18,16 +18,17 @@ export function Content() {
                 setUsername(data['username']);
                 setMessages(data['message_objects']);
                 setUsersConnected(data['usersConnected'])
+                console.log(data)
             })
             Socket.on('new message', data => {
                 setMessages([...messages,data['newMessage']])
             })
             Socket.on('addNewUser', data => {
-                setUsersConnected([...usersConnected,data['addNewUser']])
+                setUsersConnected([...usersConnected,{'username':data['addNewUser'],'auth_type':data['auth_type']}])
             })
             Socket.on('removeUser', data => {
                 let removeUser = data['removeUser']
-                setUsersConnected(usersConnected.filter( user => user !== removeUser))
+                setUsersConnected(usersConnected.filter( user => user.username !== removeUser))
             })
             return () => {
                 Socket.off('new message');
@@ -40,13 +41,14 @@ export function Content() {
     getNewAddresses();
     
     return (
-            usersConnected.includes(username)?
-                <div className="container">
-                    <Header username={username}/>
-                    <ShowUsers usersConnected={usersConnected} />
-                    <Messages messages={messages} username={username}/>
-                    <Form />
-                </div>: 
-                <Login /> 
+            username?
+            <div className="container">
+                <Header username={username}/>
+                <ShowUsers usersConnected={usersConnected} />
+                <Messages messages={messages} username={username}/>
+                <Form />
+            </div>: 
+            <Login setUsername={setUsername}/> 
+        
     );
 }

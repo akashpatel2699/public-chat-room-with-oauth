@@ -20,12 +20,18 @@ class Messages(db.Model):
 class Connected_users(db.Model):
     __tablename__ = 'connected_users'
     
-    socket_id = db.Column(db.String(100),primary_key=True, nullable=False)
-    username = db.Column(db.String(50), nullable=False)
+    sid = db.Column(db.String(50), primary_key=True)
+    auth_type = db.Column(db.String(120))
+    name = db.Column(db.String(120))
+    email = db.Column(db.String(120))
     
-    def __init__(self, socket_id, username):
-        self.socket_id = socket_id
-        self.username = username
+
+    def __init__(self, sid,auth_type,name,email):
+        assert type(auth_type) is AuthUserType
+        self.sid = sid
+        self.name = name
+        self.email= email
+        self.auth_type = auth_type.value
     def __repr__(self):
         return '<Connected_users: %s has %s>' % self.socket_id,self.username
         

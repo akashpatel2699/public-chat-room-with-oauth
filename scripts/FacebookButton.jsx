@@ -3,14 +3,14 @@ import ReactDOM from 'react-dom';
 import FacebookLogin from 'react-facebook-login';
 import { Socket } from './Socket';
  
- export const FacebookButton = ({ setUser }) => {
+ export const FacebookButton = ({ setUsername }) => {
     const responseFacebook = (response) => {
     console.log(response.email)
     Socket.emit("new facebook user", {
       'name': response.name,
       'email': response.email
     })
-    setUser(response.name);
+    setUsername(response.name);
     }
     return(
       <FacebookLogin
