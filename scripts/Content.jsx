@@ -11,6 +11,7 @@ export function Content() {
     const [messages, setMessages] = React.useState([]);
     const [username, setUsername] = React.useState("");
     const [usersConnected, setUsersConnected] = React.useState([]);
+    const [userLoggedIn, setUserLoggedIn] = React.useState(false);
     
     function getNewAddresses() {
         React.useEffect(() => {
@@ -30,10 +31,14 @@ export function Content() {
                 let removeUser = data['removeUser']
                 setUsersConnected(usersConnected.filter( user => user.username !== removeUser))
             })
+            Socket.on('authenticate', data => {
+                setUserLoggedIn(data['isAuthenticated']);
+            })
             return () => {
                 Socket.off('new message');
                 Socket.off('addNewUser');
                 Socket.off('removeUser');
+                Socket.off('authenticate');
             }
         });
     }
@@ -41,7 +46,7 @@ export function Content() {
     getNewAddresses();
     
     return (
-            username?
+            userLoggedIn?
             <div className="container">
                 <Header username={username}/>
                 <ShowUsers usersConnected={usersConnected} />

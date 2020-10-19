@@ -19,7 +19,7 @@ SEND_ALL_MESSAGES_NEW_USER_CHANNEL = 'joinuser'
 ADD_NEW_USER_CHANNEL = 'addNewUser'
 REMOVE_DISCONNECTED_USER_CHANNEL = 'removeUser'
 RECIEVE_NEW_MESSAGE = 'new message'
-AUTHENTICATED_CHANNEL = 'authenicate'
+AUTHENTICATED_CHANNEL = 'authenticate'
 
 # Convert datetime to local time zone
 tz_NY = pytz.timezone('America/New_York') 
@@ -84,11 +84,7 @@ def remove_disconnected_user(channel,socket_sid):
 def emit_all_messages(channel,socket_sid,username):
 
     all_connected_users = [ \
-<<<<<<< HEAD
-        db_users.username for db_users in \
-=======
         {'username':db_users.name,'auth_type': db_users.auth_type} for db_users in \
->>>>>>> b340bf345e587dacc3b561e59c710951f56bd5b8
         db.session.query(models.Connected_users).all()
     ]
     all_message_objects = [ \
@@ -147,7 +143,10 @@ def check_for_bot_command(message):
         bot_reply= "Unrecognized command. Please use !! help to see available commands."
     return bot_reply
 
-        
+def user_authenticated(channel, boolean):
+    socketio.emit(channel, {
+        'isAuthenticated': boolean,
+    })
 @socketio.on('connect')
 def on_connect():
     # socket_sid = flask.request.sid
@@ -162,7 +161,7 @@ def on_disconnect():
     # Socket ID of disconnected user to be remove from connected_users table in postgres
     socket_sid = flask.request.sid 
     remove_disconnected_user(REMOVE_DISCONNECTED_USER_CHANNEL,socket_sid)
-
+    user_authenticated(AUTHENTICATED_CHANNEL,False)
 
 @socketio.on('new message')
 def on_new_address(data):
@@ -185,17 +184,21 @@ def on_new_github_user(data):
             'code' : data['code']
         }
     )
-    access_token = response.text.split('&')[0].split('=')[1]
-    response = req.get("https://api.github.com/user", auth=('token', access_token))
-    response = response.json()
-    name = response['login']
-    if response['email'] == None:
-        email = name + "@null.com"
-    else: 
-        email = response['email']
-    # push_new_user_to_db(name, email ,models.AuthUserType.GITHUB)
-    add_new_connected_user(ADD_NEW_USER_CHANNEL,socket_sid,name,email,models.AuthUserType.GITHUB)
-    emit_all_messages(SEND_ALL_MESSAGES_NEW_USER_CHANNEL, socket_sid,name)
+    try:
+        access_token = response.text.split('&')[0].split('=')[1]
+        response = req.get("https://api.github.com/user", auth=('token', access_token))
+        response = response.json()
+        name = response['login']
+        if response['email'] == None:
+            email = name + "@null.com"
+        else: 
+            email = response['email']
+        add_new_connected_user(ADD_NEW_USER_CHANNEL,socket_sid,name,email,models.AuthUserType.GITHUB)
+        emit_all_messages(SEND_ALL_MESSAGES_NEW_USER_CHANNEL, socket_sid,name)
+        user_authenticated(AUTHENTICATED_CHANNEL,True)
+    except KeyError: 
+        user_authenticated(AUTHENTICATED_CHANNEL,False)
+        return
 
 @socketio.on('new facebook user')
 def on_new_facebook_user(data):
@@ -204,9 +207,9 @@ def on_new_facebook_user(data):
     email = data['email']
     print("Got an event for new facebook user input with data:", data)
     print('name for facebook: {} email is {}'.format(data['name'],data['email']))
-    # push_new_user_to_db(data['name'], data['email'],models.AuthUserType.FACEBOOK)
     add_new_connected_user(ADD_NEW_USER_CHANNEL,socket_sid,name,email,models.AuthUserType.FACEBOOK)
     emit_all_messages(SEND_ALL_MESSAGES_NEW_USER_CHANNEL, socket_sid,name)
+    user_authenticated(AUTHENTICATED_CHANNEL,True)
 
 @socketio.on('new google user')
 def on_new_google_user(data):
@@ -217,13 +220,13 @@ def on_new_google_user(data):
         name = idinfo['name']
         email = idinfo['email']
         print("Username: {} Email: {}".format(name,email))
-        # push_new_user_to_db(username, email ,models.AuthUserType.GOOGLE)
         add_new_connected_user(ADD_NEW_USER_CHANNEL,socket_sid,name,email,models.AuthUserType.GOOGLE)
         emit_all_messages(SEND_ALL_MESSAGES_NEW_USER_CHANNEL, socket_sid,name)
+        user_authenticated(AUTHENTICATED_CHANNEL,True)
     except ValueError:
         # Invalid token
+        user_authenticated(AUTHENTICATED_CHANNEL,False)
         pass
-    # TODO
 
 
 @app.route('/')
