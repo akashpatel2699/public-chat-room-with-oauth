@@ -146,15 +146,23 @@ def check_for_bot_command(message):
     
 def check_for_valid_url(message):
     try:
-        parse(message)
+        parse(message,rule="IRI")
         return True
     except ValueError:
         return False
 
-def user_authenticated(channel, boolean):
+def check_for_valid_image(image_url):
+    print("image url func")
+    image_formats = ("image/png", "image/jpeg", "image/jpg")
+    r = req.head(image_url)
+    if r.headers["content-type"] in image_formats:
+        return True
+    return False
+
+def user_authenticated(channel, boolean,socket_sid):
     socketio.emit(channel, {
         'isAuthenticated': boolean,
-    })
+    },room=socket_sid)
 @socketio.on('connect')
 def on_connect():
     # socket_sid = flask.request.sid
@@ -169,7 +177,7 @@ def on_disconnect():
     # Socket ID of disconnected user to be remove from connected_users table in postgres
     socket_sid = flask.request.sid 
     remove_disconnected_user(REMOVE_DISCONNECTED_USER_CHANNEL,socket_sid)
-    user_authenticated(AUTHENTICATED_CHANNEL,False)
+    user_authenticated(AUTHENTICATED_CHANNEL,False,socket_sid)
 
 @socketio.on('new message')
 def on_new_address(data):
@@ -177,8 +185,13 @@ def on_new_address(data):
     print(socket_sid)
     message = data['chat']
     if check_for_valid_url(message):
-        message = "<a href={} target='_blank'>{}</a>".format(message,message)
-        add_new_message(RECIEVE_NEW_MESSAGE,socket_sid,message, "")
+        if check_for_valid_image(message):
+            message = "<img src={} alt='failed to load and image' style='width:400px;height:500px;object-fit:cover;'>".format(message)
+            add_new_message(RECIEVE_NEW_MESSAGE,socket_sid,message,"")
+            # add_new_message(RECIEVE_NEW_MESSAGE,socket_sid,image_url,"")
+        else:
+            message = "<a href={} target='_blank'>{}</a>".format(message,message)
+            add_new_message(RECIEVE_NEW_MESSAGE,socket_sid,message, "")
     elif not check_for_valid_url(message):
         add_new_message(RECIEVE_NEW_MESSAGE,socket_sid,message, "")
     
@@ -208,9 +221,8 @@ def on_new_github_user(data):
             email = response['email']
         add_new_connected_user(ADD_NEW_USER_CHANNEL,socket_sid,name,email,models.AuthUserType.GITHUB)
         emit_all_messages(SEND_ALL_MESSAGES_NEW_USER_CHANNEL, socket_sid,name)
-        user_authenticated(AUTHENTICATED_CHANNEL,True)
+        user_authenticated(AUTHENTICATED_CHANNEL,True,socket_sid)
     except KeyError: 
-        user_authenticated(AUTHENTICATED_CHANNEL,False)
         return
 
 @socketio.on('new facebook user')
@@ -222,7 +234,7 @@ def on_new_facebook_user(data):
     print('name for facebook: {} email is {}'.format(data['name'],data['email']))
     add_new_connected_user(ADD_NEW_USER_CHANNEL,socket_sid,name,email,models.AuthUserType.FACEBOOK)
     emit_all_messages(SEND_ALL_MESSAGES_NEW_USER_CHANNEL, socket_sid,name)
-    user_authenticated(AUTHENTICATED_CHANNEL,True)
+    user_authenticated(AUTHENTICATED_CHANNEL,True,socket_sid)
 
 @socketio.on('new google user')
 def on_new_google_user(data):
@@ -235,10 +247,9 @@ def on_new_google_user(data):
         print("Username: {} Email: {}".format(name,email))
         add_new_connected_user(ADD_NEW_USER_CHANNEL,socket_sid,name,email,models.AuthUserType.GOOGLE)
         emit_all_messages(SEND_ALL_MESSAGES_NEW_USER_CHANNEL, socket_sid,name)
-        user_authenticated(AUTHENTICATED_CHANNEL,True)
+        user_authenticated(AUTHENTICATED_CHANNEL,True,socket_sid)
     except ValueError:
         # Invalid token
-        user_authenticated(AUTHENTICATED_CHANNEL,False)
         pass
 
 

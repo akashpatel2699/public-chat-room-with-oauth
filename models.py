@@ -8,7 +8,7 @@ class Messages(db.Model):
     __tablename__ = 'messages'
     
     username = db.Column(db.String(100),primary_key=True, nullable=False)
-    message  = db.Column(db.String(255), nullable=False)
+    message  = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime,primary_key=True, nullable=False, default=datetime.utcnow)
     def __init__(self, username,message,created_at):
         self.username = username

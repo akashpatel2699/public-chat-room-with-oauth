@@ -20,11 +20,11 @@ def about():
 
 def help():
     return "I recognize following commands and should be type exact for better conversation: \
-        <br>!! about \
-        <br>!! help  \
-        <br>!! funtranslate <message> \
-        <br>!! weather <city name>    \
-        <br>!! predict_age <name>"
+    <br>!! about \
+    <br>!! help \
+    <br>!! funtranslate {message} \
+    <br>!! weather {city name} \
+    <br>!! predict_age {name}"
 def funtranslate(message):
     URL = FUN_TRANSLATE_BASE_URL+ message
     reply = requests.get(URL)

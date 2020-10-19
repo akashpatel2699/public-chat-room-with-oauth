@@ -12,13 +12,20 @@ const Message = ({ message, username }) => {
     },[]) 
     
     let created_at = string_datetime_object(message['created_at'])
-
+    const showImageInline = (img_tag) => {
+        console.log(img_tag)
+        let src_starts_at = img_tag.search("src=") + 4;
+        let src = img_tag.slice(src_starts_at,img_tag.search("alt")-1);
+        console.log(img_tag)
+        return `<a href=${src} target="_blank">${src}</a><br>${img_tag}`
+    }
     return (
         <div className={style}>
             <p className="username"><strong>{message['username']}</strong>
             <span>{created_at.getHours() === 12? created_at.getHours(): 
                 created_at.getHours() % 12}:{created_at.getMinutes()}</span></p>
-            <p className="main-message">{ ReactHtmlParser(message['message']) }</p>
+            <p className="main-message">{ ReactHtmlParser(message['message'].includes("alt='failed to load and image'")? 
+            showImageInline(message['message'])  : message['message']) }</p>
         </div>
     );
 }
