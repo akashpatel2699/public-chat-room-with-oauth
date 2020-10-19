@@ -11,6 +11,7 @@ import pytz
 from random_username.generate import generate_username
 import requests as req
 import bot
+from rfc3987 import parse
 
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -142,6 +143,13 @@ def check_for_bot_command(message):
     else:
         bot_reply= "Unrecognized command. Please use !! help to see available commands."
     return bot_reply
+    
+def check_for_valid_url(message):
+    try:
+        parse(message)
+        return True
+    except ValueError:
+        return False
 
 def user_authenticated(channel, boolean):
     socketio.emit(channel, {
@@ -168,7 +176,12 @@ def on_new_address(data):
     socket_sid = flask.request.sid 
     print(socket_sid)
     message = data['chat']
-    add_new_message(RECIEVE_NEW_MESSAGE,socket_sid,message, "")
+    if check_for_valid_url(message):
+        message = "<a href={} target='_blank'>{}</a>".format(message,message)
+        add_new_message(RECIEVE_NEW_MESSAGE,socket_sid,message, "")
+    elif not check_for_valid_url(message):
+        add_new_message(RECIEVE_NEW_MESSAGE,socket_sid,message, "")
+    
     if message.startswith('!! ', 0 , 3):
         message =  check_for_bot_command(message)
         add_new_message(RECIEVE_NEW_MESSAGE,"",message, bot.NAME)

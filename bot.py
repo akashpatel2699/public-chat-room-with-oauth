@@ -15,13 +15,16 @@ OPEN_WEATHER_API_BASE_URL = "https://api.openweathermap.org/data/2.5/weather?"
 PREDICT_AGE_BASED_ON_API = "https://api.agify.io?name={}&country_id=US"
 
 def about():
-    return "I am %s, my job is to reply to message that have !! follow by available commands. To see the available \
-        commands: type !! help" % NAME
+    return "I am <strong>%s</strong>, my job is to reply to message that have !! follow by available commands. To see the available \
+        commands: type <br>!! help" % NAME
 
 def help():
     return "I recognize following commands and should be type exact for better conversation: \
-        !! about or !! help or !! funtranslate <message> or !! weather <city name> \
-        or !! predict_age <name>"
+        <br>!! about \
+        <br>!! help  \
+        <br>!! funtranslate <message> \
+        <br>!! weather <city name>    \
+        <br>!! predict_age <name>"
 def funtranslate(message):
     URL = FUN_TRANSLATE_BASE_URL+ message
     reply = requests.get(URL)

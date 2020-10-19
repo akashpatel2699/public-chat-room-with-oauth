@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ReactHtmlParser from 'react-html-parser';
 
 const string_datetime_object = string => new Date(Date.parse(string));
 
@@ -17,7 +18,7 @@ const Message = ({ message, username }) => {
             <p className="username"><strong>{message['username']}</strong>
             <span>{created_at.getHours() === 12? created_at.getHours(): 
                 created_at.getHours() % 12}:{created_at.getMinutes()}</span></p>
-            <p className="main-message">{message['message']}</p>
+            <p className="main-message">{ ReactHtmlParser(message['message']) }</p>
         </div>
     );
 }
