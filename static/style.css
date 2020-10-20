@@ -64,6 +64,27 @@ body {
     animation: fly 2s;
     animation-timing-function: ease-in;
 }
+.connected-user {
+    display: flex;
+    justify-content: space-evenly;
+    width: 70%;
+    height: auto;
+}
+.connected-user-profile img{
+    width: 50px;
+    height: 50px;
+    border-radius: 20px;
+    object-fit: cover;
+}
+.connected-user-info {
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+}
+.connected-user-username {
+    font-size: 1rem;
+    font-weight: bold;
+}
 @keyframes fly {
   0%   {left:-200px; top:0px;}
   25%  {left:-150px; top:0px;}

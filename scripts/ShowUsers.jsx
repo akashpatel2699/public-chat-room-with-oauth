@@ -8,12 +8,13 @@ const ShowUsers = ({ usersConnected }) => {
                 <ul className="users-list">
                     { usersConnected[0] && usersConnected.map((user,index) => 
                         <li key={index}>
-                            <div>
-                                <div>
+                            <div className="connected-user">
+                                <div className="connected-user-profile">
                                     <img src={user.profile_url} alt="User Profile"/>
                                 </div>
-                                <div>
-                                    {user.username} {user.auth_type}
+                                <div className="connected-user-info">
+                                    <span className="connected-user-username"> {user.username}</span> 
+                                    <span className="connected-user-auth-type">{user.auth_type}</span>
                                 </div>
                             </div>
                         </li>
