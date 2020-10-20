@@ -6,10 +6,12 @@ import { GoogleButton } from './GoogleButton';
 const Login = ({ setUsername}) => {
     
     return (
-        <div>
-            <FacebookButton setUsername={setUsername}/>
-            <GithubButton />
-            <GoogleButton />
+        <div className="login-container">
+            <div className="login-buttons">
+                <FacebookButton setUsername={setUsername}/>
+                <GithubButton />
+                <GoogleButton />
+            </div>
         </div>
     );
 };
