@@ -2,7 +2,10 @@ import React from 'react';
 
 const Header = ({ username}) => {
     return (
-        <h1 className="header">Welcome {username} to the public chat room</h1>    
+        <h1 
+            className="header">
+            Welcome {username} to the public chat room
+        </h1>    
     );
 }
 

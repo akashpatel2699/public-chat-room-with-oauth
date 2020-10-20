@@ -19,14 +19,12 @@ export function Content() {
                 setUser({'username':data['user']['username'],'email':data['user']['email']});
                 setMessages(data['message_objects']);
                 setUsersConnected(data['usersConnected'])
-                console.log(data)
             })
             Socket.on('new message', data => {
                 setMessages([...messages,data['newMessage']])
             })
             Socket.on('addNewUser', data => {
                 setUsersConnected([...usersConnected,{'username':data['addNewUser'],'auth_type':data['auth_type'], 'profile_url': data['profile_url']}])
-                console.log(data['profile_url'])
             })
             Socket.on('removeUser', data => {
                 let removeUser = data['removeUser']

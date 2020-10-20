@@ -10,10 +10,13 @@ const Messages = ({messages, username}) => {
         messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
     }
 
-  useEffect(scrollToBottom, [messages]);
+    useEffect(scrollToBottom, [messages]);
+    
     return (
         <div className="messages-container">
-            { messages && messages.map( (message,index) => <Message username={username} key={index} message={message} />)}
+            { messages &&
+                messages.map( (message,index) => <Message username={username} key={index} message={message} />
+            )}
             <div ref={messagesEndRef} />
         </div>
     );

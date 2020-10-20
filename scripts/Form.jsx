@@ -2,13 +2,17 @@ import React, { useState } from "react";
 import { Socket } from './Socket';
 
 const Form = ({ email }) => {
+  
   const [input, setInput] = useState("");
   const [buttonState, setButtonState] = useState(true);
 
   const handleChange = (event) => {
     const data = event.target.value;
-    if (data.trim().length > 0 ) setButtonState(false);
-    else setButtonState(true);
+    if (data.trim().length > 0 ){
+      setButtonState(false);
+    }else{ 
+      setButtonState(true);
+    }
     setInput(data);
   };
   const handleClick = (e) => {
@@ -23,8 +27,17 @@ const Form = ({ email }) => {
 
   return (
     <form className="text-input">
-      <input value={input} type="text" onChange={handleChange} className="user-input" required />
-      <button id="button" onClick={handleClick} disabled={buttonState}>
+      <input 
+        value={input} 
+        type="text" 
+        onChange={handleChange} 
+        className="user-input" 
+        required 
+      />
+      <button 
+        id="button" 
+        onClick={handleClick} 
+        disabled={buttonState}>
         Submit
       </button>
     </form>

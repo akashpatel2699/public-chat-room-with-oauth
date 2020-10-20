@@ -9,10 +9,14 @@ class Messages(db.Model):
     
     username = db.Column(db.String(100),primary_key=True, nullable=False)
     message  = db.Column(db.Text, nullable=False)
+    message_type = db.Column(db.String(50), nullable=False, default="text message")
     created_at = db.Column(db.DateTime,primary_key=True, nullable=False, default=datetime.utcnow)
-    def __init__(self, username,message,created_at):
+    
+    def __init__(self, username,message,message_type,created_at):
+        assert type(message_type) is MessageType
         self.username = username
         self.message = message
+        self.message_type = message_type.value
         self.created_at = created_at
     def __repr__(self):
         return '<message: %s by %s>' % self.message,self.username
@@ -41,3 +45,9 @@ class AuthUserType(Enum):
     GOOGLE = "google"
     FACEBOOK = "facebook"
     GITHUB = "github"
+
+class MessageType(Enum):
+    TEXT_MESSAGE = "text message"
+    URL_LINKS = 'url link'
+    IMAGE_URL = 'image url'
+    BOT_MESSAGE = 'bot message'
