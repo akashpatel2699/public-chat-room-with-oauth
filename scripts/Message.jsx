@@ -19,7 +19,10 @@ const Message = ({ message, username}) => {
     return (
         <div className={style}>
             <p className="username"><strong>{message['username']}</strong>
-            <span>{created_at.getHours() === 12? created_at.getHours(): 
+            <span>
+                {created_at.getMonth()}/
+                {created_at.getDay()}/
+                {created_at.getFullYear()} {created_at.getHours() === 12? created_at.getHours(): 
                 created_at.getHours() % 12}:{created_at.getMinutes()}</span></p>
             <p className="main-message">{ ReactHtmlParser(message['message'].includes("alt='failed to load and image'")? 
             showImageInline(message['message'])  : message['message']) }</p>
