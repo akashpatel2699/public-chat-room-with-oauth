@@ -117,7 +117,7 @@ body {
 .connected-user-profile img{
     width: 50px;
     height: 50px;
-    border-radius: 20px;
+    border-radius: 15px;
     object-fit: cover;
 }
 .connected-user-info {
@@ -146,31 +146,52 @@ body {
     overflow: auto;
     background: rgb(152,251,152);
     border-radius: 25px;
-}
-.message  {
-    width: 100%;
-    height: auto;
     display: flex;
     flex-direction: column;
 }
-.message .username {
+.message-container {
+    width: fit-content;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    margin: 1rem 0;
+    padding: 0.7rem;
+    background: rgb(0,0,0,.2);
+    border-radius: inherit;
+}
+.right-side .message-info {
+    align-self: flex-end;
+}
+.message-container .message-info .username {
     margin: 0px;
     margin-top: 1rem;
     margin-top: 0.6rem;
     font-size: 1.2rem;
 }
-.main-message {
-    margin: 0px;
-    margin-bottom: 0.5rem;
-    font-size: 1.4rem;
-}
-.message .username span {
+.message-container .message-info .date-time{
     font-size: 0.8rem;
     padding: 0.4rem;
     font-weight: lighter;
 }
+.time {
+    margin-left: 0.2rem;
+}
+.message {
+    margin: 0px;
+    margin-bottom: 0.5rem;
+    font-size: 1.4rem;
+}
+
+.message img {
+    width: auto;
+    height: 300px;
+    min-width: 30%;
+    min-height: auto;
+    object-fit: cover;
+}
+
 .right-side {
-    align-items: flex-end;
+    align-self: flex-end;
 }
 .bot-message{
     padding: 0.4rem;
