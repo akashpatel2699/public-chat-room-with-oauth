@@ -9,14 +9,14 @@ import Login from './Login';
 
 export function Content() {
     const [messages, setMessages] = React.useState([]);
-    const [username, setUsername] = React.useState("");
+    const [user, setUser] = React.useState({});
     const [usersConnected, setUsersConnected] = React.useState([]);
     const [userLoggedIn, setUserLoggedIn] = React.useState(false);
     
     function getNewAddresses() {
         React.useEffect(() => {
             Socket.on('joinuser', data => {
-                setUsername(data['username']);
+                setUser({'username':data['user']['username'],'email':data['user']['email']});
                 setMessages(data['message_objects']);
                 setUsersConnected(data['usersConnected'])
                 console.log(data)
@@ -45,15 +45,16 @@ export function Content() {
     
     getNewAddresses();
     
+    
     return (
-            userLoggedIn?
+        userLoggedIn?
             <div className="container">
-                <Header username={username}/>
+                <Header username={user.username}/>
                 <ShowUsers usersConnected={usersConnected} />
-                <Messages messages={messages} username={username}/>
-                <Form />
-            </div>: 
-            <Login setUsername={setUsername}/> 
-        
+                <Messages messages={messages} username={user.username}/>
+                <Form email={user.email}/>
+            </div>
+            : 
+            <Login setUsername={setUser}/>
     );
 }

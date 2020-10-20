@@ -3,7 +3,7 @@ import { FacebookButton } from './FacebookButton';
 import { GithubButton } from './GithubButton';
 import { GoogleButton } from './GoogleButton';
 
-const Login = ({ setUsername }) => {
+const Login = ({ setUsername}) => {
     
     return (
         <div>

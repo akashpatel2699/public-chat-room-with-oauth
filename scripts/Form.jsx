@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Socket } from './Socket';
 
-const Form = () => {
+const Form = ({ email }) => {
   const [input, setInput] = useState("");
   const [buttonState, setButtonState] = useState(true);
 
@@ -16,7 +16,8 @@ const Form = () => {
     setInput("");
     setButtonState(true);
     Socket.emit("new message", {
-        'chat':input,    
+        'chat':input,  
+        'email': email
     })
   };
 
