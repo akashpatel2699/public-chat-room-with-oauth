@@ -25,7 +25,8 @@ export function Content() {
                 setMessages([...messages,data['newMessage']])
             })
             Socket.on('addNewUser', data => {
-                setUsersConnected([...usersConnected,{'username':data['addNewUser'],'auth_type':data['auth_type']}])
+                setUsersConnected([...usersConnected,{'username':data['addNewUser'],'auth_type':data['auth_type'], 'profile_url': data['profile_url']}])
+                console.log(data['profile_url'])
             })
             Socket.on('removeUser', data => {
                 let removeUser = data['removeUser']

@@ -6,10 +6,11 @@ import { Socket } from './Socket';
  export const FacebookButton = ({ setUsername }) => {
     
     const responseFacebook = (response) => {
-    console.log(response.email)
+    console.log(response.picture.data.url)
     Socket.emit("new facebook user", {
       'name': response.name,
-      'email': response.email
+      'email': response.email,
+      'url': response.picture.data.url
     })
     setUsername(response.name);
     }

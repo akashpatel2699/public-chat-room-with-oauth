@@ -24,22 +24,20 @@ class Connected_users(db.Model):
     auth_type = db.Column(db.String(120))
     name = db.Column(db.String(120))
     email = db.Column(db.String(120))
-    
+    profile_url = db.Column(db.Text)
 
-    def __init__(self, sid,auth_type,name,email):
+    def __init__(self, sid,auth_type,name,email,profile_url):
         assert type(auth_type) is AuthUserType
         self.sid = sid
         self.name = name
         self.email= email
         self.auth_type = auth_type.value
+        self.profile_url = profile_url
+        
     def __repr__(self):
         return '<Connected_users: %s has %s>' % self.socket_id,self.username
         
 class AuthUserType(Enum):
-    LINKEDIN = "linkedin"
     GOOGLE = "google"
     FACEBOOK = "facebook"
-    INSTAGRAM = "instagram"
-    TWITTER = "twitter"
     GITHUB = "github"
-    PASSWORD = "password"

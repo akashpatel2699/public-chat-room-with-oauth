@@ -41,22 +41,23 @@ github_client_secret = os.environ['GITHUB_CLIENT_SECRET']
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
 
-# db = flask_sqlalchemy.SQLAlchemy(app)
-# db.init_app(app)
-# db.app = app
+db = flask_sqlalchemy.SQLAlchemy(app)
+db.init_app(app)
+db.app = app
 
 import models
 
 
-db = flask_sqlalchemy.SQLAlchemy()
-def init_db(app):
-    db.init_app(app)
-    db.app = app     # May not be necessary, but I had some issues without it I think
-    db.create_all()
-    db.session.commit()
+# db = flask_sqlalchemy.SQLAlchemy(app)
+# def init_db(app):
+#     db.init_app(app)
+#     db.app = app     # May not be necessary, but I had some issues without it I think
+#     import models
+#     db.create_all()
+#     db.session.commit()
     
 #Add newly connected user to currently connected users in postgres
-def add_new_connected_user(channel,socket_sid,name,email,auth_type):
+def add_new_connected_user(channel,socket_sid,name,email,auth_type, profile_url):
     user_exist_in_db = db.session.query(models.Connected_users).filter_by(email=email).first()
     if user_exist_in_db and (email == user_exist_in_db.email and auth_type.value != user_exist_in_db.auth_type):
         user_exist_in_db.auth_type = auth_type
@@ -67,10 +68,10 @@ def add_new_connected_user(channel,socket_sid,name,email,auth_type):
     elif user_exist_in_db and auth_type == user_exist_in_db.auth_type:
         return
     else:
-        new_user  = models.Connected_users(sid=socket_sid,auth_type=auth_type,name=name,email=email)
+        new_user  = models.Connected_users(sid=socket_sid,auth_type=auth_type,name=name,email=email,profile_url=profile_url)
         db.session.add(new_user)
     db.session.commit()
-    socketio.emit(channel, {'addNewUser': name,'auth_type': auth_type.value},skip_sid=socket_sid)
+    socketio.emit(channel, {'addNewUser': name,'auth_type': auth_type.value, 'profile_url': profile_url},skip_sid=socket_sid)
     
 # Remove disconnected user from connected users list in postgres 
 def remove_disconnected_user(channel,socket_sid):
@@ -82,10 +83,10 @@ def remove_disconnected_user(channel,socket_sid):
         db.session.commit()
         socketio.emit(channel, {'removeUser': username},include_self=False)
 
-def emit_all_messages(channel,socket_sid,username, email):
+def emit_all_messages(channel,socket_sid,username, email, profile_url):
 
     all_connected_users = [ \
-        {'username':db_users.name,'auth_type': db_users.auth_type} for db_users in \
+        {'username':db_user.name,'auth_type': db_user.auth_type, 'profile_url': db_user.profile_url} for db_user in \
         db.session.query(models.Connected_users).all()
     ]
     all_message_objects = [ \
@@ -177,7 +178,9 @@ def on_connect():
 @socketio.on('disconnect')
 def on_disconnect():
     # Socket ID of disconnected user to be remove from connected_users table in postgres
+    print("disconnected")
     socket_sid = flask.request.sid 
+    print(socket_sid)
     remove_disconnected_user(REMOVE_DISCONNECTED_USER_CHANNEL,socket_sid)
     user_authenticated(AUTHENTICATED_CHANNEL,False,socket_sid)
 
@@ -216,13 +219,16 @@ def on_new_github_user(data):
         response = req.get("https://api.github.com/user", auth=('token', access_token))
         response = response.json()
         name = response['login']
+        avatar_url = response['avatar_url']
         if response['email'] == None:
             email = name + "@null.com"
         else: 
             email = response['email']
-        add_new_connected_user(ADD_NEW_USER_CHANNEL,socket_sid,name,email,models.AuthUserType.GITHUB)
-        emit_all_messages(SEND_ALL_MESSAGES_NEW_USER_CHANNEL, socket_sid, name, email)
+        
+        add_new_connected_user(ADD_NEW_USER_CHANNEL,socket_sid,name,email,models.AuthUserType.GITHUB,avatar_url)
+        emit_all_messages(SEND_ALL_MESSAGES_NEW_USER_CHANNEL, socket_sid, name, email, avatar_url)
         user_authenticated(AUTHENTICATED_CHANNEL,True,socket_sid)
+        
     except KeyError: 
         return
 
@@ -231,10 +237,12 @@ def on_new_facebook_user(data):
     socket_sid = flask.request.sid 
     name = data['name']
     email = data['email']
+    profile_url = data['url']
     print("Got an event for new facebook user input with data:", data)
     print('name for facebook: {} email is {}'.format(data['name'],data['email']))
-    add_new_connected_user(ADD_NEW_USER_CHANNEL,socket_sid,name,email,models.AuthUserType.FACEBOOK)
-    emit_all_messages(SEND_ALL_MESSAGES_NEW_USER_CHANNEL, socket_sid, name, email)
+    
+    add_new_connected_user(ADD_NEW_USER_CHANNEL,socket_sid,name,email,models.AuthUserType.FACEBOOK,profile_url)
+    emit_all_messages(SEND_ALL_MESSAGES_NEW_USER_CHANNEL, socket_sid, name, email, profile_url)
     user_authenticated(AUTHENTICATED_CHANNEL,True,socket_sid)
 
 @socketio.on('new google user')
@@ -245,10 +253,14 @@ def on_new_google_user(data):
         userid = idinfo['sub']
         name = idinfo['name']
         email = idinfo['email']
+        profile_url = idinfo['picture']
+        print(profile_url)
         print("Username: {} Email: {}".format(name,email))
-        add_new_connected_user(ADD_NEW_USER_CHANNEL,socket_sid,name,email,models.AuthUserType.GOOGLE)
-        emit_all_messages(SEND_ALL_MESSAGES_NEW_USER_CHANNEL, socket_sid, name, email)
+        
+        add_new_connected_user(ADD_NEW_USER_CHANNEL,socket_sid,name,email,models.AuthUserType.GOOGLE,profile_url)
+        emit_all_messages(SEND_ALL_MESSAGES_NEW_USER_CHANNEL, socket_sid, name, email,profile_url)
         user_authenticated(AUTHENTICATED_CHANNEL,True,socket_sid)
+        
     except ValueError:
         # Invalid token
         pass
@@ -259,7 +271,6 @@ def index():
     return flask.render_template("index.html")
 
 if __name__ == '__main__': 
-    init_db(app)
     socketio.run(
         app,
         host=os.getenv('IP', '0.0.0.0'),
