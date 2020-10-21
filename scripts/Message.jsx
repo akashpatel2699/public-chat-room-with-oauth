@@ -3,7 +3,7 @@ import ReactHtmlParser from 'react-html-parser';
 
 const Message = ({ message, username}) => {
     
-    const [style, setStyle ] = useState("message")
+    const [style, setStyle ] = useState("message-container")
     
     useEffect(() => {
         (username === message['username'])? setStyle(prev => prev + " right-side"): null;
@@ -27,26 +27,30 @@ const Message = ({ message, username}) => {
     
     return (
         <div className={style}>
-            <p className="username">
-                <strong>
-                    {message['username']}
-                </strong>
-                <span>
+            <div className="message-info">
+                <span className="username">
+                    <strong>
+                        {message['username']}
+                    </strong>
+                </span>
+                <span className="date-time">
                     {created_at.getMonth()}/
                     {created_at.getDay()}/
                     {created_at.getFullYear()} 
-                    {
-                        created_at.getHours() === 12? created_at.getHours(): 
-                        created_at.getHours() % 12}:{created_at.getMinutes()
-                    }
+                    <span className="time">
+                        {created_at.getHours() === 12? created_at.getHours(): 
+                        created_at.getHours() % 12}:{created_at.getMinutes()}
+                    </span>
                 </span>
-            </p>
-            <p className="main-message">
+            </div>
+            <div className="message">
+                <span>
                     { ReactHtmlParser(
-                       ( message.message_type === "url link" || message.message_type === "image url" )?
+                        ( message.message_type === "url link" || message.message_type === "image url" )?
                         imageOrAnchorTag(message) : message.message
                     ) }
-            </p>
+                </span>
+            </div>
         </div>
     );
 }
