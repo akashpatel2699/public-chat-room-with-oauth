@@ -212,6 +212,9 @@ component wrong and after an hour I was able to resolved by just accepting the p
   They were able to log in without authentication by changing my state fromn false to true. I did search on this topic
   but didn't find any good solution rather than disabling the developer tool.
 
+* I had to push to heroku again to rebuild my application because I inserted github client secret wrong and I tried restarting 
+  dynos but that didn't work.
+
 
 ## Improvements
 * If I had more time then I would have implemented an API for random jokes so when client types 
