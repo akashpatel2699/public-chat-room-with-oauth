@@ -11,7 +11,7 @@ const onFailure = response => console.error(response);
 export const GithubButton = () => {
     return (
       <GitHubLogin 
-        clientId="Iv1.225a6103dab2fcc6"
+        clientId="Iv1.6393fa29ac6d0900"
         redirectUri=""
         onSuccess={onSuccess}
         onFailure={onFailure}
