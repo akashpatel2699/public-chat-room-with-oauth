@@ -9,7 +9,7 @@ const onSuccessGoogle = (response) => {
         'id_token': id_token
     })
 }
-const onFailureGoogle = response => alert(response);
+const onFailureGoogle = response => console.error(response);
  
 export const GoogleButton = () => {
     

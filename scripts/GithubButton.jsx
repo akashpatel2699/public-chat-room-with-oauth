@@ -6,7 +6,7 @@ import { Socket } from './Socket';
 const onSuccess = response => {
     Socket.emit('new github user', {'code': response.code})
 }
-const onFailure = response => alert(response);
+const onFailure = response => console.error(response);
  
 export const GithubButton = () => {
     return (
