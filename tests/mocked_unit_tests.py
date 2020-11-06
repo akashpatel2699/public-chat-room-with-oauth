@@ -544,13 +544,15 @@ class mocked_unit_tests(unittest.TestCase):
             False,mocked_request_sid.sid)
      
      
+    @mock.patch("app.check_for_bot_command")
     @mock.patch("app.check_for_valid_image")
     @mock.patch("app.add_new_message")
     @mock.patch("app.flask.request")
     def test_on_new_message(self,mocked_request_sid,mocked_add_new_message,\
-    mocked_check_for_valid_image):
+    mocked_check_for_valid_image, mocked_check_for_bot_command):
         mocked_check_for_valid_image.side_effect = [False,True]
         for test_case in self.on_new_message_success:
+            mocked_check_for_bot_command.return_value = "!! about"
             mocked_request_sid.sid = "1234"
             input = test_case[KEY_INPUT]
             expected = test_case[KEY_EXPECTED]
