@@ -12,8 +12,11 @@ jobs:
       - python/install-deps
       - python/save-cache
       - run:
-          command: coverage run -m --source=. unittest tests/*.py   
-          name: Back-end test
+          command: python ./tests/unmocked_unit_test.py
+          name: unmocked tests
+      - run:
+          command: python ./tests/mocked_unit_test.py
+          name: mocked tests
       - run:
           command: pylint *.py 
           name: Back-end styling
