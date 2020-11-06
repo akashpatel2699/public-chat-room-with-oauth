@@ -8,8 +8,10 @@ import sys
 import os
 import datetime
 import unittest.mock as mock
+from os.path import dirname, join
 
-sys.path.append("..")
+# pylint: disable=C0413
+sys.path.append(join(dirname(__file__), "../"))
 import unittest
 from app import check_for_bot_command, check_for_valid_url
 from bot import NAME

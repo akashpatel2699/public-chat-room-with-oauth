@@ -5,8 +5,19 @@
 '''
 
 import sys
-sys.path.append("..")
+import unittest.mock as mock
+from unittest.mock import Mock
+from dotenv import load_dotenv
+import os
+import datetime
+from os.path import join, dirname
+import requests
+import pytz
 import unittest
+
+# pylint: disable=C0413
+sys.path.append(join(dirname(__file__), "../"))
+from app import tz_NY
 from app import SEND_ALL_MESSAGES_NEW_USER_CHANNEL, ADD_NEW_USER_CHANNEL, \
             REMOVE_DISCONNECTED_USER_CHANNEL,RECIEVE_NEW_MESSAGE,AUTHENTICATED_CHANNEL
 from app import database_uri, google_client_id, github_client_id, github_client_secret
@@ -18,17 +29,6 @@ from bot import NAME, FUN_TRANSLATE_BASE_URL, OPEN_WEATHER_API_BASE_URL,PREDICT_
 from bot import OPEN_WEATHER_API_KEY
 from bot import funtranslate
 from models import AuthUserType, MessageType
-
-import unittest.mock as mock
-from unittest.mock import Mock
-from dotenv import load_dotenv
-import os
-import datetime
-from os.path import join, dirname
-import requests
-import pytz
-from app import tz_NY
-
 
 KEY_INPUT = "input"
 KEY_EXPECTED = "expected"
