@@ -12,10 +12,10 @@ jobs:
       - python/install-deps
       - python/save-cache
       - run:
-          command: python ./tests/unmocked_unit_test.py
+          command: python ./tests/unmocked_unit_tests.py
           name: unmocked tests
       - run:
-          command: python ./tests/mocked_unit_test.py
+          command: python ./tests/mocked_unit_tests.py
           name: mocked tests
       - run:
           command: pylint *.py 
