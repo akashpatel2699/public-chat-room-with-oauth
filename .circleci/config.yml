@@ -12,9 +12,6 @@ jobs:
       - python/install-deps
       - python/save-cache
       - run:
-          name: pre-dependencies
-          command: pip install coverage
-      - run:
           command: coverage run -m --source=. unittest tests/*.py   
           name: Back-end test
       - run:
