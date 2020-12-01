@@ -30,14 +30,15 @@ KEY_AUTH_TYPE = "auth_type"
 
 
 class Unmocked_unit_tests(unittest.TestCase):
-    '''
-        test all function that doesn't required any
-        part of it to be mocked for response 
-    '''
+    """
+    test all function that doesn't required any
+    part of it to be mocked for response
+    """
+
     def setUp(self):
-        '''
-            setup before test functions are called that why its called setup
-        '''
+        """
+        setup before test functions are called that why its called setup
+        """
         self.check_about_bot_command = [
             {
                 KEY_INPUT: "!! about",
@@ -130,9 +131,9 @@ class Unmocked_unit_tests(unittest.TestCase):
         )
 
     def test_check_about_bot_command_success(self):
-        '''
-            test !! about command of bot
-        '''
+        """
+        test !! about command of bot
+        """
         for test_case in self.check_about_bot_command:
             response = check_for_bot_command(test_case[KEY_INPUT])
             expected = test_case[KEY_EXPECTED]
@@ -140,10 +141,10 @@ class Unmocked_unit_tests(unittest.TestCase):
             self.assertEqual(response, expected)
 
     def test_edge_case_about_bot_command_success(self):
-        '''
-            check if !! something about still works that same 
-            as !! about
-        '''
+        """
+        check if !! something about still works that same
+        as !! about
+        """
         for test_case in self.check_edge_case_for_about_bot_command:
             response = check_for_bot_command(test_case[KEY_INPUT])
             expected = test_case[KEY_EXPECTED]
@@ -151,9 +152,9 @@ class Unmocked_unit_tests(unittest.TestCase):
             self.assertEqual(response, expected)
 
     def test_check_help_bot_command_success(self):
-        '''
-            check !! help command 
-        '''
+        """
+        check !! help command
+        """
         for test_case in self.check_help_bot_command:
             response = check_for_bot_command(test_case[KEY_INPUT])
             expected = test_case[KEY_EXPECTED]
@@ -161,10 +162,10 @@ class Unmocked_unit_tests(unittest.TestCase):
             self.assertEqual(response, expected)
 
     def test_edge_case_help_bot_command_success(self):
-        '''
-            check !! something help command 
-            and works same as !! help
-        '''
+        """
+        check !! something help command
+        and works same as !! help
+        """
         for test_case in self.check_edge_case_for_help_bot_command:
             response = check_for_bot_command(test_case[KEY_INPUT])
             expected = test_case[KEY_EXPECTED]
@@ -172,10 +173,10 @@ class Unmocked_unit_tests(unittest.TestCase):
             self.assertEqual(response, expected)
 
     def test_check_bot_command_failure(self):
-        '''
-            check command that are not expected 
-            such as !! not known command or !! hi
-        '''
+        """
+        check command that are not expected
+        such as !! not known command or !! hi
+        """
         for test_case in self.check_bot_command_failure:
             response = check_for_bot_command(test_case[KEY_INPUT])
             expected = test_case[KEY_EXPECTED]
@@ -183,11 +184,11 @@ class Unmocked_unit_tests(unittest.TestCase):
             self.assertEqual(response, expected)
 
     def test_check_for_valid_url(self):
-        '''
-            test that valid url indentifies 
-            an url to be a URL and also
-            check when it raises an exception
-        '''
+        """
+        test that valid url indentifies
+        an url to be a URL and also
+        check when it raises an exception
+        """
         for test_case in self.check_for_valid_url_success:
             response = check_for_valid_url(test_case[KEY_INPUT])
             expected = test_case[KEY_EXPECTED]
@@ -203,9 +204,9 @@ class Unmocked_unit_tests(unittest.TestCase):
             self.assertNotEqual(response, expected)
 
     def test_models_Messages_init(self):
-        ''' 
-            test models Messages constructor for correctness
-        '''
+        """
+        test models Messages constructor for correctness
+        """
         expected = self.check_models_Messages_init_success[0][KEY_EXPECTED]
         message_object = self.message_object
         self.assertEqual(expected[KEY_NAME], message_object.username)
@@ -213,10 +214,10 @@ class Unmocked_unit_tests(unittest.TestCase):
         self.assertEqual(expected[KEY_MESSAGE_TYPE].value, message_object.message_type)
 
     def test_models_Messages_repr(self):
-        '''
-            check models Messages method that
-            represents the object
-        '''
+        """
+        check models Messages method that
+        represents the object
+        """
         self.assertEqual(
             self.check_models_Messages_repr_success[0][KEY_EXPECTED].format(
                 "testing message", "akash"
@@ -225,9 +226,9 @@ class Unmocked_unit_tests(unittest.TestCase):
         )
 
     def test_models_Connected_users_init(self):
-        '''
-            test Connected_users constructor
-        '''
+        """
+        test Connected_users constructor
+        """
         expected = self.check_models_Connected_users_init_success[0][KEY_EXPECTED]
         connected_user_object = self.connected_user_object
         self.assertEqual(expected[KEY_NAME], connected_user_object.name)
@@ -235,9 +236,9 @@ class Unmocked_unit_tests(unittest.TestCase):
         self.assertEqual(expected[KEY_AUTH_TYPE].value, connected_user_object.auth_type)
 
     def test_models_Connected_users_repr(self):
-        '''
-            test method that represents the object
-        '''
+        """
+        test method that represents the object
+        """
         self.assertEqual(
             "<Connected_users: {} has {}>".format("12345", "akash"),
             self.connected_user_object.__repr__(),

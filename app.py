@@ -49,7 +49,7 @@ github_client_secret = os.environ["GITHUB_CLIENT_SECRET"]
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
 
-# pylint: disable=no-member,too-many-arguments
+# pylint: disable=no-member,too-many-arguments, bad-continuation
 def init_db(init_app):
     """
     Initialize the databse with app
@@ -277,6 +277,7 @@ def on_connect():
     so the login page is displayed before allowing to messaging page
     """
     socket_sid = flask.request.sid
+
     user_authenticated(AUTHENTICATED_CHANNEL, False, socket_sid)
 
 
