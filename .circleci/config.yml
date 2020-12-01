@@ -17,12 +17,6 @@ jobs:
       - run:
           command: python ./tests/mocked_unit_tests.py
           name: mocked tests
-      - run:
-          command: pylint *.py 
-          name: Back-end styling
-      - run:
-          command: eslint scripts/*.jsx  
-          name: Front-end test
 
 workflows:
   main:
