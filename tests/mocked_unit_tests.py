@@ -708,39 +708,39 @@ class mocked_unit_tests(unittest.TestCase):
     @mock.patch("app.emit_all_messages")
     @mock.patch("app.add_new_connected_user")
     @mock.patch("app.id_token.verify_oauth2_token")
-    @mock.patch("app.flask.request", return_value=mock.MagicMock())
     def test_on_new_google_user(
         self,
-        mocked_request_sid,
         mocked_google_verify_token,
         mocked_add_new_connected_user,
         mocked_emit_all_messages,
         mocked_user_authenticated,
     ):
-        for test_case in self.on_new_google_user_success:
-            mocked_request_sid.sid = "12345"
-            input = test_case[KEY_INPUT]
-            expected = test_case[KEY_EXPECTED]
-            mocked_google_verify_token.return_value = {
-                "sub": "1111",
-                KEY_NAME: "akashpatel",
-                KEY_EMAIL: "akashpatel@gmail.com",
-                "picture": "https://profileURL.com",
-            }
-            on_new_google_user(input)
-
-            mocked_add_new_connected_user.assert_called_with(
-                ADD_NEW_USER_CHANNEL,
-                mocked_request_sid.sid,
-                expected[KEY_NAME],
-                expected[KEY_EMAIL],
-                AuthUserType.GOOGLE,
-                expected[KEY_PROFILE_URL],
-            )
-            mocked_emit_all_messages.called_once()
-            mocked_user_authenticated.assert_called_with(
-                AUTHENTICATED_CHANNEL, True, expected[KEY_SOCKET_ID]
-            )
+        mocker = mock.MagicMock()
+        mocker.sid = "12345"
+        with mock.patch("app.flask.request",mocker):
+            for test_case in self.on_new_google_user_success:
+                input = test_case[KEY_INPUT]
+                expected = test_case[KEY_EXPECTED]
+                mocked_google_verify_token.return_value = {
+                    "sub": "1111",
+                    KEY_NAME: "akashpatel",
+                    KEY_EMAIL: "akashpatel@gmail.com",
+                    "picture": "https://profileURL.com",
+                }
+                on_new_google_user(input)
+    
+                mocked_add_new_connected_user.assert_called_with(
+                    ADD_NEW_USER_CHANNEL,
+                    mocker.sid,
+                    expected[KEY_NAME],
+                    expected[KEY_EMAIL],
+                    AuthUserType.GOOGLE,
+                    expected[KEY_PROFILE_URL],
+                )
+                mocked_emit_all_messages.called_once()
+                mocked_user_authenticated.assert_called_with(
+                    AUTHENTICATED_CHANNEL, True, expected[KEY_SOCKET_ID]
+                )
 
 
 if __name__ == "__main__":
