@@ -617,92 +617,93 @@ class mocked_unit_tests(unittest.TestCase):
             mocked_session_commit.called_once()
 
     @mock.patch("app.user_authenticated")
-    @mock.patch("app.flask.request", return_value=mock.MagicMock())
-    def test_on_connect(self, mocked_request_sid, mocked_user_authenticated):
-        mocked_request_sid.sid = "1234"
-        on_connect()
-        mocked_user_authenticated.assert_called_with(
-            AUTHENTICATED_CHANNEL, False, mocked_request_sid.sid
-        )
+    def test_on_connect(self, mocked_user_authenticated):
+        mocker = mock.MagicMock()
+        mocker.sid = "12345"
+        with mock.patch("app.flask.request",mocker):
+            on_connect()
+            mocked_user_authenticated.assert_called_with(
+                AUTHENTICATED_CHANNEL, False, mocker.sid
+            )
 
     @mock.patch("app.user_authenticated")
     @mock.patch("app.remove_disconnected_user")
-    @mock.patch("app.flask.request", return_value=mock.MagicMock())
     def test_on_disconnect(
         self,
-        mocked_request_sid,
         mocked_remove_disconnected_user,
         mocked_user_authenticated,
     ):
-        mocked_request_sid.sid = "1234"
-        on_disconnect()
-        mocked_remove_disconnected_user.assert_called_with(
-            REMOVE_DISCONNECTED_USER_CHANNEL, mocked_request_sid.sid
-        )
-        mocked_user_authenticated.assert_called_with(
-            AUTHENTICATED_CHANNEL, False, mocked_request_sid.sid
-        )
+        mocker = mock.MagicMock()
+        mocker.sid = "12345"
+        with mock.patch("app.flask.request",mocker):
+            on_disconnect()
+            mocked_remove_disconnected_user.assert_called_with(
+                REMOVE_DISCONNECTED_USER_CHANNEL, mocker.sid
+            )
+            mocked_user_authenticated.assert_called_with(
+                AUTHENTICATED_CHANNEL, False, mocker.sid
+            )
 
     @mock.patch("app.check_for_bot_command")
     @mock.patch("app.check_for_valid_image")
     @mock.patch("app.add_new_message")
-    @mock.patch("app.flask.request", return_value=mock.MagicMock())
     def test_on_new_message(
         self,
-        mocked_request_sid,
         mocked_add_new_message,
         mocked_check_for_valid_image,
         mocked_check_for_bot_command,
     ):
         mocked_check_for_valid_image.side_effect = [False, True]
-        mocked_request_sid.sid = "1234"
-        for test_case in self.on_new_message_success:
-            mocked_check_for_bot_command.return_value = "!! about"
-            input = test_case[KEY_INPUT]
-            expected = test_case[KEY_EXPECTED]
-            on_new_message(input)
-            if expected[KEY_NAME] == NAME:
-                self.assertEqual(mocked_add_new_message.call_count, 3)
-            else:
-                mocked_add_new_message.assert_called_with(
-                    RECIEVE_NEW_MESSAGE,
-                    mocked_request_sid.sid,
-                    expected[KEY_CHAT],
-                    expected[KEY_MESSAGE_TYPE],
-                    expected[KEY_NAME],
-                    expected[KEY_EMAIL],
-                )
+        mocker = mock.MagicMock()
+        mocker.sid = "12345"
+        with mock.patch("app.flask.request",mocker):
+            for test_case in self.on_new_message_success:
+                mocked_check_for_bot_command.return_value = "!! about"
+                input = test_case[KEY_INPUT]
+                expected = test_case[KEY_EXPECTED]
+                on_new_message(input)
+                if expected[KEY_NAME] == NAME:
+                    self.assertEqual(mocked_add_new_message.call_count, 3)
+                else:
+                    mocked_add_new_message.assert_called_with(
+                        RECIEVE_NEW_MESSAGE,
+                        mocker.sid,
+                        expected[KEY_CHAT],
+                        expected[KEY_MESSAGE_TYPE],
+                        expected[KEY_NAME],
+                        expected[KEY_EMAIL],
+                    )
 
     @mock.patch("app.user_authenticated")
     @mock.patch("app.emit_all_messages")
     @mock.patch("app.add_new_connected_user")
-    @mock.patch("app.flask.request", return_value=mock.MagicMock())
     def test_on_new_facebook_user(
         self,
-        mocked_request_sid,
         mocked_add_new_connected_user,
         mocked_emit_all_messages,
         mocked_user_authenticated,
     ):
-        for test_case in self.on_new_facebook_user_success:
-            mocked_request_sid.sid = "12345"
-            input = test_case[KEY_INPUT]
-            expected = test_case[KEY_EXPECTED]
-
-            on_new_facebook_user(input)
-
-            mocked_add_new_connected_user.assert_called_with(
-                ADD_NEW_USER_CHANNEL,
-                mocked_request_sid.sid,
-                expected[KEY_NAME],
-                expected[KEY_EMAIL],
-                AuthUserType.FACEBOOK,
-                expected["url"],
-            )
-            mocked_emit_all_messages.called_once()
-            mocked_user_authenticated.assert_called_with(
-                AUTHENTICATED_CHANNEL, True, expected[KEY_SOCKET_ID]
-            )
+        mocker = mock.MagicMock()
+        mocker.sid = "12345"
+        with mock.patch("app.flask.request",mocker):
+            for test_case in self.on_new_facebook_user_success:
+                input = test_case[KEY_INPUT]
+                expected = test_case[KEY_EXPECTED]
+    
+                on_new_facebook_user(input)
+    
+                mocked_add_new_connected_user.assert_called_with(
+                    ADD_NEW_USER_CHANNEL,
+                    mocker.sid,
+                    expected[KEY_NAME],
+                    expected[KEY_EMAIL],
+                    AuthUserType.FACEBOOK,
+                    expected["url"],
+                )
+                mocked_emit_all_messages.called_once()
+                mocked_user_authenticated.assert_called_with(
+                    AUTHENTICATED_CHANNEL, True, expected[KEY_SOCKET_ID]
+                )
 
     @mock.patch("app.user_authenticated")
     @mock.patch("app.emit_all_messages")
